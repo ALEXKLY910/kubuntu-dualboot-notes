@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+current_scheme="$(kreadconfig6 --file kdeglobals --group General --key ColorScheme 2>/dev/null)"
+
+if [[ "$current_scheme" == "BreezeDark" ]]; then
+    plasma-apply-colorscheme BreezeLight
+    fuzzel_scheme="$HOME/.config/fuzzel/themes/light.ini"
+else
+    plasma-apply-colorscheme BreezeDark
+    fuzzel_scheme="$HOME/.config/fuzzel/themes/dracula.ini"
+fi
+
+[[ -f "$fuzzel_scheme" ]] || { echo "Missing fuzzel color scheme file: $fuzzel_scheme" >&2; exit 1; }
+
+ln -sf $fuzzel_scheme $HOME/.config/fuzzel/themes/current.ini

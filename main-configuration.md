@@ -47,67 +47,67 @@ Then proceed to installation.
 
 # Configure Kubuntu
 
-1. Kubuntu has APT package manager, here's a bunch of commands:
-   '''
-   Arch:
-   pacman -Syu update system
-   pacman -S package install package
-   pacman -R package remove package
-   pacman -Ss name search package
+1.  Kubuntu has APT package manager, here's a bunch of commands:
+    '''
+    Arch:
+    pacman -Syu - update system
+    pacman -S package - install package
+    pacman -R package - remove package
+    pacman -Ss name - search package
 
-   Kubuntu/Ubuntu:
-   sudo apt update refresh package lists
-   sudo apt upgrade install available updates
-   sudo apt install package install package
-   sudo apt remove package remove package
-   apt search name search package
-   '''
+    Kubuntu/Ubuntu:
+    sudo apt update - refresh package lists
+    sudo apt upgrade - install available updates
+    sudo apt install package - install package
+    sudo apt remove package - remove package
+    apt search name - search package
+    '''
 
-   First, run:
-   `sudo apt update`
-   `sudo apt full-upgrade`
+    First, run:
+    `sudo apt update`
+    `sudo apt full-upgrade`
 
-2. Then install the drivers:
-   `sudo ubuntu-drivers install`
-   Reboot.
+2.  Then install the drivers:
+    `sudo ubuntu-drivers install`
+    Reboot.
 
-3. If on the lock screen after reboot/cold boot the wireless keyboard is not connected, maybe wait a little. If it didn't connect even then, do this:
-   1. Open the config: `sudo nano /etc/bluetooth/main.conf`
-   2. Uncomment this: `AutoEnable=true`
-   3. Restart Bluetooth service: `sudo systemctl restart bluetooth`
-   4. Make sure the keyboard is trusted: run `bluetoothctl`. Inside run `devices`. Then `trust XX:XX:XX:XX:XX:XX`, where the argument is the MAC address. Then `quit`
-   5. Reboot.
+3.  If on the lock screen after reboot/cold boot the wireless keyboard is not connected, maybe wait a little. If it didn't connect even then, do this:
+    1. Open the config: `sudo nano /etc/bluetooth/main.conf`
+    2. Uncomment this: `AutoEnable=true`
+    3. Restart Bluetooth service: `sudo systemctl restart bluetooth`
+    4. Make sure the keyboard is trusted: run `bluetoothctl`. Inside run `devices`. Then `trust XX:XX:XX:XX:XX:XX`, where the argument is the MAC address. Then `quit`
+    5. Reboot.
 
-4. Download Chrome:
-   '''
-   wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-   sudo apt install ./google-chrome-stable_current_amd64.deb
-   '''
-5. Run `swapon --show`. In my case, the swapfile was only 512M, which is a symbolic amount of RAM. We'll configure zram and keep this swapfile as a simple backup.
-   1. Install the zram package: `sudo apt install systemd-zram-generator`
-   2. Create the config: `sudo nano /etc/systemd/zram-generator.conf`. Paste this:
-      '''
-      [zram0]
-      zram-size = min(ram / 2, 8192)
-      compression-algorithm = zstd
-      swap-priority = 100
-      '''
-      Then reboot.
-   3. Run `swapon --show` to verify.
+4.  Download Chrome:
+    '''
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    sudo apt install ./google-chrome-stable_current_amd64.deb
+    '''
+5.  Run `swapon --show`. In my case, the swapfile was only 512M, which is a symbolic amount of RAM. We'll configure zram and keep this swapfile as a simple backup.
+    1. Install the zram package: `sudo apt install systemd-zram-generator`
+    2. Create the config: `sudo nano /etc/systemd/zram-generator.conf`. Paste this:
+       '''
+       [zram0]
+       zram-size = min(ram / 2, 8192)
+       compression-algorithm = zstd
+       swap-priority = 100
+       '''
+       Then reboot.
+    3. Run `swapon --show` to verify.
 
-6. Run `sudo ufw status verbose` - it prints the status of the firewall. If it prints "Status: inactive", we'll activate it:
-   '''
-   sudo ufw default deny incoming
-   sudo ufw default allow outgoing
-   sudo ufw enable
-   '''
+6.  Run `sudo ufw status verbose` - it prints the status of the firewall. If it prints "Status: inactive", we'll activate it:
+    '''
+    sudo ufw default deny incoming
+    sudo ufw default allow outgoing
+    sudo ufw enable
+    '''
 
-7. Install basic tools: git, package building tools, curl and wget for download/requests, archive tools:
-   `sudo apt install git build-essential curl wget unzip zip 7zip unrar`
-   In my case only "build-essential" and "unrar" weren't already installed
+7.  Install basic tools: git, package building tools, curl and wget for download/requests, archive tools:
+    `sudo apt install git build-essential curl wget unzip zip 7zip unrar`
+    In my case only "build-essential" and "unrar" weren't already installed
 
-8. Install LibreOffice: `sudo apt install libreoffice`
-9. Install VLC Player: `sudo apt install vlc`
+8.  Install LibreOffice: `sudo apt install libreoffice`
+9.  Install VLC Player: `sudo apt install vlc`
 10. Install Microsoft's VS Code:
     '''
     cd ~/Downloads
@@ -124,3 +124,132 @@ Then proceed to installation.
     wget "https://discord.com/api/download?platform=linux&format=deb" -O discord.deb
     sudo apt install ./discord.deb
     '''
+14. Install fonts:
+    `sudo apt install fonts-noto-color-emoji fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-jetbrains-mono fonts-powerline`
+
+    Also, install JetBrains Mono Nerd:
+    '''
+    cd ~/Downloads
+
+    wget https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz -O JetBrainsMono.tar.xz
+
+    mkdir -p ~/.local/share/fonts/JetBrainsMonoNerd
+    tar -xf JetBrainsMono.tar.xz -C ~/.local/share/fonts/JetBrainsMonoNerd
+    '''
+    fc-cache -r
+
+15. Install Ghostty: `sudo apt install ghostty`. In Default Applications (System Settings) make it be the default terminal emulator.
+
+16. Go to System Settings:
+    1. Mouse & Touchpad: disable the mouse acceleration, tweak the pointer speed
+    2. Keyboard: enable layouts, add Russian layout, bind Alt+Shift for changing the layout, disable the popup.
+    3. In Display & Monitor disable actions for when the cursor touches the edges or corners.
+    4. In accessibility remove shake pointer to find it feature
+    5. In Disks & Cameras turn automount all known devices on login and on attach.
+    6. In animations, configure animations.
+    7. In Power Management, configure sleep, dim, turn off screen and power profile.
+
+17. Install Fuzzel: `sudo apt install fuzzel`. Bind it by going into Shortcuts, Add New, Program or Script, use `fuzzel` as the script.
+
+18. Configure the shortcuts in Keyboard -> Shortcuts in System Settings.
+
+19. Install CopyQ: `sudo apt install copyq`. Also, install wl-clipboard: `sudo apt install wl-clipboard`.
+    Configure CopyQ: add the shortcut, disable saving the items after reboot.
+
+20. Remap the Caps key to be a modifier and add the shortcuts for Home and End:
+
+    > `sudo apt install keyd`
+    > `sudo nano /etc/keyd/default.conf`
+
+        '''
+         [ids]
+         *
+
+         [main]
+         capslock = layer(caps)
+
+         [caps]
+         left = home
+         right = end
+         C-left = C-home
+         C-right = C-end
+        '''
+
+    > `sudo systemctl enable --now keyd`
+    > `sudo systemctl restart keyd`
+
+21. Create a theme toggle script:
+    `mkdir -p ~/.local/bin`
+    `nano ~/.local/bin/toggle-theme`
+    Reference scripts/toggle-theme.
+    `chmod +x ~/.local/bin/toggle-theme`
+    Bind it.
+22. Configure multi-desktop workflow:
+    1. First, create 10 virtual desktops: System Settings → search “Virtual Desktops”
+    2. Search: Close Window; Set: Meta + C
+    3. Search: Fullscreen; Set: Meta + F
+    4. Search: Switch to Desktop 1; Set: Meta + 1
+    5. Search: Window to Desktop 1; Set: Meta + Shift + 1
+    6. To view all desktops, press Meta + G
+    7. Search: Maximize Window; Set: Meta + M
+    8. Download Compact Pager in Plasma Widgets store
+    9. Search: Keep Window Above; Set: Ctrl+Meta+T
+
+23. Configure Fuzzel to have a dark theme.
+    1. Create `~/.config/fuzzel/themes/`.
+    2. Create `~/.config/fuzzel/themes/dracula.ini` and paste this inside:
+
+    ```
+    [colors]
+    background=1f1f1fff
+    text=ccccccff
+    match=4daafcff
+    selection=0078d4cc
+    selection-text=ffffffff
+    selection-match=4daafcff
+    border=2b2b2bff
+    prompt=ccccccff
+    placeholder=989898ff
+    input=ccccccff
+    counter=9d9d9dff
+    ```
+
+    3. Create `~/.config/fuzzel/themes/light.ini` and leave it empty.
+    4. Create `~/.config/fuzzel/fuzzel.ini` and paste this inside:
+
+    ```
+    [main]
+    include=~/.config/fuzzel/themes/current.ini
+    ```
+
+    5. Create a symlink, say, to dark:
+
+       > `ln -sf ~/.config/fuzzel/themes/dracula.ini ~/.config/fuzzel/themes/current.ini`
+
+    6. Switch the destination of the symlink between `dracula.ini` and `light.ini` based on the current system theme in the `toggle-theme` script. Add this somewhere after declaring `is_new_dark` variable:
+
+    ```
+    # Wire up fuzzel's theme
+
+    if [[ "$is_new_dark" == "true" ]]; then
+       fuzzel_scheme="~/.config/fuzzel/themes/dracula.ini"
+    else
+       fuzzel_scheme="~/.config/fuzzel/themes/light.ini"
+    fi
+
+    [[ -f "$fuzzel_scheme" ]] || {echo "Missing fuzzel color scheme file: $fuzzel_scheme" >&2; exit 1; }
+
+    ln -sf $fuzzel_scheme $HOME/.config/fuzzel/themes/current.ini
+    ```
+
+24. Install **zapret**
+    1. `git clone   https://github.com/Sergeydigl3/zapret-discord-youtube-linux.git && cd zapret-discord-youtube-linux`
+
+    2. '''
+       ./service.sh download-deps --default
+       ./service.sh
+       '''
+
+<!-- ./service.sh service status -->
+
+    3. Open terminal, run `./service.sh run --config conf.env`
