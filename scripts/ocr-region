@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+image_file="$(mktemp --suffix=.png)"
+error_file="$(mktemp)"
+
+trap 'rm -f "$image_file" "$error_file"' EXIT
+
+language="$(
+    kdialog \
+        --title "OCR Language" \
+        --inputbox "Enter Tesseract language code(s): eng, rus, jpn, eng+rus, etc." \
+        "eng"
+)" || exit 0
+
+language="$(echo "$language" | tr -d '[:space:]')"
+
+if [[ -z "$language" ]]; then
+    notify-send "OCR" "No language selected"
+    exit 0
+fi
+
+spectacle --background --region --output "$image_file" --nonotify || exit 0
+
+text="$(
+    tesseract "$image_file" stdout -l "$language" --psm 6 2>"$error_file"
+)" || {
+    kdialog --error "OCR failed:
+
+$(cat "$error_file")"
+    exit 1
+}
+
+text="$(printf '%s' "$text" | sed -e 's/[[:space:]]*$//')"
+
+if [[ -z "$text" ]]; then
+    notify-send "OCR" "No text recognized"
+    exit 0
+fi
+
+printf '%s' "$text" | wl-copy
+
+notify-send "OCR" "Text copied to clipboard"

@@ -1,15 +1,43 @@
 #!/usr/bin/env bash
 
+settings_file="$HOME/.config/Code/User/settings.json"
+
+light_kde_scheme="BreezeLight"
+dark_kde_scheme="BreezeDark"
+
+light_vscode_theme="Solarized Light"
+dark_vscode_theme="Default Dark Modern"
+
 current_scheme="$(kreadconfig6 --file kdeglobals --group General --key ColorScheme 2>/dev/null)"
 
-if [[ "$current_scheme" == "BreezeDark" ]]; then
-    plasma-apply-colorscheme BreezeLight
+set_vscode_theme() {
+    local theme="$1"
+
+    if [[ -f "$settings_file" ]]; then
+        perl -0pi -e 's/"workbench\.colorTheme"\s*:\s*"[^"]*"/"workbench.colorTheme": "'"$theme"'"/g' "$settings_file"
+    fi
+}
+
+if [[ "$current_scheme" == "$dark_kde_scheme" ]]; then
+    plasma-apply-colorscheme "$light_kde_scheme"
+    set_vscode_theme "$light_vscode_theme"
+    ghostty_scheme="$HOME/.config/ghostty/themes/default-light.conf"
     fuzzel_scheme="$HOME/.config/fuzzel/themes/light.ini"
 else
-    plasma-apply-colorscheme BreezeDark
+    plasma-apply-colorscheme "$dark_kde_scheme"
+    set_vscode_theme "$dark_vscode_theme"
+    ghostty_scheme="$HOME/.config/ghostty/themes/default-dark.conf"
     fuzzel_scheme="$HOME/.config/fuzzel/themes/dracula.ini"
 fi
+
+[[ -f "$ghostty_scheme" ]] || { echo "Missing ghostty color scheme file: $ghostty_scheme" >&2; exit 1; }
+
+ln -sf $ghostty_scheme $HOME/.config/ghostty/themes/current.conf
+
+#reload ghostty's config
+pkill -USR2 -x ghostty
 
 [[ -f "$fuzzel_scheme" ]] || { echo "Missing fuzzel color scheme file: $fuzzel_scheme" >&2; exit 1; }
 
 ln -sf $fuzzel_scheme $HOME/.config/fuzzel/themes/current.ini
+

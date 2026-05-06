@@ -184,6 +184,7 @@ Then proceed to installation.
     Reference scripts/toggle-theme.
     `chmod +x ~/.local/bin/toggle-theme`
     Bind it.
+
 22. Configure multi-desktop workflow:
     1. First, create 10 virtual desktops: System Settings → search “Virtual Desktops”
     2. Search: Close Window; Set: Meta + C
@@ -250,6 +251,119 @@ Then proceed to installation.
        ./service.sh
        '''
 
-<!-- ./service.sh service status -->
+    ./service.sh service status
 
-    3. Open terminal, run `./service.sh run --config conf.env`
+    '''
+    ./service.sh service start
+    ./service.sh service stop
+    ./service.sh service restart
+    '''
+
+    <!-- 3. Open terminal, run `./service.sh run --config conf.env` -->
+
+25. Configure screenshot shortcuts:
+    Bind: `spectacle --background --fullscreen --copy-image --nonotify && notify-send "Screenshot" "Fullscreen copied to clipboard"` to Win+S
+    Bind: `bash -lc 'mkdir -p "$HOME/Pictures/Screenshots"; spectacle --background --fullscreen --output "$HOME/Pictures/Screenshots/shot-$(date +%F_%H-%M-%S).png" --nonotify && notify-send "Screenshot" "Fullscreen saved to Pictures/Screenshots"'` to Win+Ctrl+S
+    Bind: `spectacle --background --region --copy-image --nonotify && notify-send "Screenshot" "Selection copied to clipboard"` to Win+Shift+S
+    Bind: `bash -lc 'mkdir -p "$HOME/Pictures/Screenshots"; spectacle --background --region --output "$HOME/Pictures/Screenshots/area-$(date +%F_%H-%M-%S).png" --nonotify && notify-send "Screenshot" "Selection saved to Pictures/Screenshots"'` to Win+Shift+Ctrl+S
+
+    Also, in spectacle, Accept on click-and-release.
+
+26. Configure OCR.
+    1. `sudo apt install tesseract-ocr tesseract-ocr-eng tesseract-ocr-rus tesseract-ocr-jpn kdialog wl-clipboard libnotify-bin`
+    2. `nano ~/.local/bin/ocr-region`. Paste the contents of scripts/ocr-region
+    3. `chmod +x ~/.local/bin/ocr-region`
+
+27. Configure ghostty:
+    1. Check out solarized themes:
+
+       > `ghostty +list-themes --plain`
+
+    2. Create a file at `~/.config/ghostty/themes/default-light.conf`. Paste inside it:
+
+    ```
+    theme="Monokai Pro Light Sun"
+    ```
+
+    3. Create a file at `~/.config/ghostty/themes/default-dark.conf`. Paste inside it:
+
+    ```
+    theme="Dark Modern"
+    ```
+
+    4. Create a symlink to one of them:
+
+    > `ln -sf ~/.config/ghostty/themes/default-light.conf ~/.config/ghostty/themes/current.conf` 5. Create a file at `~/.config/ghostty/config` and paste inside it:
+
+    ```
+    config-file = themes/current.conf
+
+    # stop some TUI apps from using near-background colors on text
+    minimum-contrast = 2
+
+    font-size=14
+    working-directory=inherit
+    ```
+
+    6. Paste this to our toggle script beneath the `is_new_dark` variable declaration:
+
+    ```
+    #Wire up ghostty's theme
+
+    if [[ "$is_new_dark" == "true" ]]; then
+       ghostty_scheme="$HOME/.config/ghostty/themes/default-dark.conf"
+    else
+       ghostty_scheme="$HOME/.config/ghostty/themes/default-light.conf"
+    fi
+
+    [[ -f "$ghostty_scheme" ]] || { echo "Missing ghostty color scheme file: $ghostty_scheme" >&2; exit 1; }
+
+    ln -sf $ghostty_scheme $HOME/.config/ghostty/themes/current.conf
+
+    #reload ghostty's config
+    pkill -USR2 -x ghostty
+
+    ```
+
+28. Configure fuzzy search across your filesystem:
+    1. > `sudo apt install fzf`
+
+    2. Add to `~/.bashrc`
+
+    <!-- to find where fzf installed the scripts, run `dpkg -L fzf | grep -E 'key-bindings|completion'` -->
+
+    ```
+    # fzf keybindings + completion
+    [ -f /usr/share/doc/fzf/examples/completion.bash ] && source /usr/share/doc/fzf/examples/completion.bash
+    [ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && source /usr/share/doc/fzf/examples/key-bindings.bash
+    ```
+
+    Then reload:
+
+    > `source ~/.bashrc`
+
+    Now you can type `Ctrl+T` in a shell and fuzzy search!
+
+29. Configure Syncthing.
+
+> `sudo apt install syncthing`
+
+1.  If you want to enable the service run this:
+    > `systemctl --user enable --now syncthing.service`
+2.  If you want to toggle the service by a keybind and make it so it won't autostart, reference and tie the script: `arch_linux_configs/toggle-syncthing.sh`
+
+Create it at `~/.local/bin/toggle-syncthing`. Make it executable. Tie it to SUPER+SHIFT+Y
+
+You use the service in a browser by typing this URL:
+
+`http://127.0.0.1:8384`
+
+Turn on versioning (staggered).
+
+You can modify .stignore to include stuff you don't want to sync.
+
+If you hit a limit of files uploaded at once, modify `/etc/sysctl.d/99-inotify.conf` by adding `fs.inotify.max_user_watches=524288`. And running `sud sysctl --system`.
+
+30. Nova. Reference nova.md
+31. Lightning
+32. Shared folder (FS) for Syncthing
