@@ -369,5 +369,16 @@ You can modify .stignore to include stuff you don't want to sync.
 If you hit a limit of files uploaded at once, modify `/etc/sysctl.d/99-inotify.conf` by adding `fs.inotify.max_user_watches=524288`. And running `sud sysctl --system`.
 
 30. Nova. Reference nova.md
+
 31. Lightning
+    Try OpenRGB:
+
+```bash
+sudo apt update
+sudo apt install openrgb
+```
+
+JRAINBOW1: 40
+JRAINBOW2: 10
+
 32. Shared folder (FS) for Syncthing
