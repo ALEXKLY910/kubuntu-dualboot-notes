@@ -90,6 +90,8 @@ Add TDR Nova plugin inside Carla, open it and configure it (reference `nova/nova
 
 ---
 
+## 8. Create qpwgraph configs
+
 In qpwgraph, make sure the connections you made are present:
 
 NovaFX output → Carla input
@@ -100,3 +102,75 @@ Enable these options for the patchbay: Activated, Exclusive
 If this output is actually your external DAC, save it as:
 
 `~/.config/qpwgraph/nova-dac.qpwgraph`
+
+Then connect the builtin version, save it as:
+`~/.config/qpwgraph/nova-builtin.qpwgraph`
+
+## 9.
+
+Copy `scripts/qpwgraph-select-audio` to `~/.local/bin/qpwgraph-select-audio`, make it executable.
+Copy `services/qpwgraph.service` to `~/.config/systemd/user/qpwgraph.service`.
+Reload systemd:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user status dac-hotplug.path --no-pager
+```
+
+Copy `services/dac-hotplug.path` to `~/.config/systemd/user/dac-hotplug.path`
+Copy `services/dac-hotplug.service` to `~/.config/systemd/user/dac-hotplug.service`
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now dac-hotplug.path
+systemctl --user status dac-hotplug.path --no-pager
+```
+
+Copy `scripts/audio-volume` to `~/.local/bin/audio-volume`, make it executable.
+Copy `scripts/audio-mode` to `~/.local/bin/audio-mode`, make it executable.
+
+## 10.
+
+Toggle `/home/alex/.local/bin/audio-mode toggle` to Meta+Shift+E
+
+Then configure a window rule so that carla open on 9th desktop (System Settings -> Window Rules). Window class `carla`. Add property "Virtual Desktops"
+
+## 11.
+
+Search for volume shortcuts and disable or reassign KDE’s default ones for:
+
+Volume Up
+Volume Down
+Mute
+
+Then add custom command shortcuts:
+
+Volume Up:
+`/home/alex/.local/bin/audio-volume up 5%`
+Volume Down:
+`/home/alex/.local/bin/audio-volume down 5%`
+Mute:
+`/home/alex/.local/bin/audio-volume mute`
+Shift + Volume Up:
+`/home/alex/.local/bin/audio-volume up 1%`
+Shift + Volume Down:
+`/home/alex/.local/bin/audio-volume down 1%`
+
+## 12.
+
+```bash
+mkdir -p ~/.config/autostart
+nano ~/.config/autostart/audio-mode.desktop
+```
+
+Paste:
+
+```
+[Desktop Entry]
+Type=Application
+Name=Audio Mode Restore
+Exec=/home/alex/.local/bin/audio-mode auto
+X-KDE-autostart-after=panel
+StartupNotify=false
+Terminal=false
+```

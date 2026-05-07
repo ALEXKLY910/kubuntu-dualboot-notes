@@ -1,0 +1,11 @@
+[Unit]
+Description=Qpwgraph (Nova patchbay)
+After=pipewire.service pipewire-pulse.service wireplumber.service
+
+[Service]
+ExecStart=/usr/bin/qpwgraph -a -x -m /home/alex/.config/qpwgraph/nova-active.qpwgraph
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

@@ -301,8 +301,12 @@ Then proceed to installation.
     # stop some TUI apps from using near-background colors on text
     minimum-contrast = 2
 
-    font-size=14
-    working-directory=inherit
+    font-size=16
+
+    working-directory = inherit
+    window-inherit-working-directory = false
+    tab-inherit-working-directory = true
+    split-inherit-working-directory = true
     ```
 
     6. Paste this to our toggle script beneath the `is_new_dark` variable declaration:
