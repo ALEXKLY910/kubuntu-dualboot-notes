@@ -381,4 +381,75 @@ sudo apt install openrgb
 JRAINBOW1: 40
 JRAINBOW2: 10
 
-32. Shared folder (FS) for Syncthing
+32. Shared folder (FS) for Syncthing.
+
+Boot into Windows, shrink the main partition:
+Right-click start button -> Disk Management
+Shrink -> 102400 MB
+Click on unallocated space, "New Simple Volume"
+
+```
+S:
+NTFS
+Label: Shared
+Size: ~100 GB
+Quick format: enabled
+Compression: disabled
+```
+
+Create a permanent mount folder in Kubuntu and test-mount it.
+
+```bash
+sudo mkdir -p /mnt/shared
+```
+
+Install NTFS support if it's not already installed:
+
+```bash
+sudo apt install ntfs-3g
+```
+
+Mount the partition manually:
+
+```bash
+sudo mount -t ntfs-3g UUID=B4E8D716E8D6D5A8 /mnt/shared -o uid=1000,gid=1000,umask=022,windows_names
+```
+
+P.S. in order to find out its UUID, run `lsblk -o NAME,SIZE,FSTYPE,LABEL,UUID,MOUNTPOINTS`
+Check that it's mounted:
+
+```bash
+df -h | grep shared
+```
+
+Now we make the mount permanent.
+First back up `/etc/fstab`:
+
+```bash
+sudo cp /etc/fstab /etc/fstab.backup
+```
+
+Open it:
+
+```bash
+sudo nano /etc/fstab
+```
+
+Add this line at the bottom:
+
+```
+UUID=B4E8D716E8D6D5A8 /mnt/shared ntfs-3g uid=1000,gid=1000,dmask=022,fmask=133,windows_names,nofail,x-systemd.device-timeout=10 0 0
+```
+
+```bash
+systemctl daemon-reload
+```
+
+Test it:
+
+```bash
+sudo umount /mnt/shared
+sudo mount -a
+df -h | grep shared
+ls -la /mnt/shared
+```
