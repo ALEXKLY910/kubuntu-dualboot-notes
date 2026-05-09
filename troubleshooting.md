@@ -72,7 +72,6 @@ EOF
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable fix-realtek-bluetooth.service
 ```
 
 ```bash
