@@ -2,10 +2,10 @@
 
 sudo apt install snapd
 
-<!-- mp3tag analogue -->
-
-sudo apt install puddletag
-
 <!-- audacity -->
 
 sudo apt install audacity
+
+<!-- music tag editor -->
+
+sudo apt install kid3
