@@ -9,3 +9,7 @@ sudo apt install audacity
 <!-- music tag editor -->
 
 sudo apt install kid3
+
+<!-- npm -->
+
+sudo apt isntall npm
