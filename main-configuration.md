@@ -243,23 +243,39 @@ Then proceed to installation.
     ln -sf $fuzzel_scheme $HOME/.config/fuzzel/themes/current.ini
     ```
 
-24. Install **zapret**
-    1. `git clone   https://github.com/Sergeydigl3/zapret-discord-youtube-linux.git && cd zapret-discord-youtube-linux`
+24. Install **zapret**.
 
-    2. '''
-       ./service.sh download-deps --default
-       ./service.sh
-       '''
+```bash
+cd ~/Apps
+git clone https://github.com/Sergeydigl3/zapret-discord-youtube-linux.git && cd zapret-discord-youtube-linux
+./service.sh download-deps --default
+./service.sh
+```
 
-    ./service.sh service status
+```
+3. Изменить конфигурацию. enp... - ethernet; wlp... - wi-fi.
+   After that a file called conf.env is created.
+```
 
-    '''
-    ./service.sh service start
-    ./service.sh service stop
-    ./service.sh service restart
-    '''
+```bash
+./service.sh run --config conf.env
+```
 
-    <!-- 3. Open terminal, run `./service.sh run --config conf.env` -->
+Or create and alias:
+
+```bash
+nano ~/.bashrc
+```
+
+Put inside:
+
+```
+alias zapret="/home/alex/Apps/zapret-discord-youtube-linux/service.sh run --config /home/alex/Apps/zapret-discord-youtube-linux/conf.env"
+```
+
+```bash
+source ~/.bashrc
+```
 
 25. Configure screenshot shortcuts:
     Bind: `spectacle --background --fullscreen --copy-image --nonotify && notify-send "Screenshot" "Fullscreen copied to clipboard"` to Win+S
