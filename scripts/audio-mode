@@ -48,13 +48,24 @@ move_inputs_from_sink() {
   done
 }
 
-stop_proc() {
-  local name="$1"
+carla_running() {
+  pgrep -f '(/usr/share/carla/carla|/usr/bin/carla)' >/dev/null
+}
 
-  pkill -x "$name" || true
+stop_carla() {
+  pkill -f '(/usr/share/carla/carla|/usr/bin/carla)' || true
+
+  for _ in {1..40}; do
+    carla_running || return 0
+    sleep 0.1
+  done
+}
+
+stop_qpwgraph() {
+  pkill -x qpwgraph || true
 
   for _ in {1..30}; do
-    pgrep -x "$name" >/dev/null || return 0
+    pgrep -x qpwgraph >/dev/null || return 0
     sleep 0.1
   done
 }
@@ -76,6 +87,58 @@ notify_mode() {
   notify-send "Audio mode" "$1"
 }
 
+wait_for_pipewire() {
+  for _ in {1..40}; do
+    if pactl info >/dev/null 2>&1 && pw-link -i >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.25
+  done
+
+  echo "PipeWire/PulseAudio did not become ready"
+  return 1
+}
+
+carla_ports_ready() {
+  pw-link -i | grep -qx 'Carla:audio-in1' &&
+  pw-link -i | grep -qx 'Carla:audio-in2' &&
+  pw-link -o | grep -qx 'Carla:audio-out1' &&
+  pw-link -o | grep -qx 'Carla:audio-out2'
+}
+
+start_carla() {
+  WINELOADER="$WINELOADER_PATH" pw-jack carla "$CARLA_PROJECT" >/tmp/carla-nova.log 2>&1 &
+}
+
+ensure_carla_ready() {
+  if carla_ports_ready; then
+    return 0
+  fi
+
+  if carla_running; then
+    stop_carla
+    sleep 1
+  fi
+
+  for attempt in 1 2 3; do
+    start_carla
+
+    for _ in {1..40}; do
+      if carla_ports_ready; then
+        return 0
+      fi
+      sleep 0.25
+    done
+
+    stop_carla
+    sleep 1
+  done
+
+  notify_mode "Carla failed to expose audio ports"
+  echo "Carla failed to expose audio ports. Check /tmp/carla-nova.log"
+  return 1
+}
+
 case "$ACTION" in
   auto)
     if [[ -f "$STATE" ]]; then
@@ -95,12 +158,9 @@ esac
 
 case "$ACTION" in
   nova)
+    wait_for_pipewire
     ensure_nova_sink
-
-    if ! pgrep -x carla >/dev/null; then
-      WINELOADER="$WINELOADER_PATH" pw-jack carla "$CARLA_PROJECT" >/tmp/carla-nova.log 2>&1 &
-      sleep 2
-    fi
+    ensure_carla_ready
 
     "$HOME/.local/bin/qpwgraph-select-audio" || true
     systemctl --user start dac-hotplug.path || true
@@ -119,8 +179,8 @@ case "$ACTION" in
     REAL_SINK="$(real_sink)"
 
     systemctl --user stop dac-hotplug.path qpwgraph.service || true
-    stop_proc qpwgraph
-    stop_proc carla
+    stop_qpwgraph
+    stop_carla
     sleep 0.5
 
     pactl set-default-sink "$REAL_SINK"
