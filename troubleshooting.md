@@ -100,3 +100,11 @@ systemctl --user status bluetooth-power-on.service --no-pager
 ```
 
 ---
+
+basic apt package maintenance:
+
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt autoremove
+```
