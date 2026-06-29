@@ -469,3 +469,9 @@ sudo mount -a
 df -h | grep shared
 ls -la /mnt/shared
 ```
+
+And create a symlink in Kubuntu:
+
+```bash
+ln -s /mnt/shared/Sync ~/Sync
+```
